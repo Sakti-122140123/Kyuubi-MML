@@ -1,24 +1,35 @@
-# Multimodal Music Emotion Recognition (MER) — Late Fusion
-Tugas Besar Pembelajaran Mesin Multimodal (IF25-40304)
-Kelompok 09 — Institut Teknologi Sumatera
+# 🎵 Multimodal Music Emotion Recognition (MER) — Late Fusion  
+**Tugas Besar Pembelajaran Mesin Multimodal (IF25-40304)**  
+Kelompok 09 — Institut Teknologi Sumatera  
+*Audio • Lyrics • MIDI | Late Fusion | Deep Learning*
 
 ---
 
-## Ringkasan Proyek
-Proyek ini mengembangkan sistem Multimodal Music Emotion Recognition (MER) untuk mengklasifikasikan lagu ke dalam 5 klaster emosi MIREX dengan memanfaatkan tiga modalitas utama: Audio, Lyrics, dan MIDI. Pendekatan Late Fusion digunakan untuk menggabungkan keluaran dari encoder tiap modalitas sehingga mampu mengatasi batasan pada pendekatan unimodal.
+## 📌 Ringkasan Proyek  
+Proyek ini mengembangkan sistem **Multimodal Music Emotion Recognition (MER)** untuk mengklasifikasikan lagu ke dalam **5 klaster emosi MIREX** dengan memanfaatkan tiga modalitas utama: **Audio, Lyrics, dan MIDI**.  
+
+Pendekatan **Late Fusion** digunakan untuk menggabungkan informasi emosional dari setiap modalitas, yang diproses terlebih dahulu menggunakan encoder khusus:  
+- **CRNN** untuk audio,  
+- **BERT** untuk lirik,  
+- **BiGRU** untuk MIDI.  
+
+Setiap modalitas memiliki karakteristik emosional unik sehingga penggabungan output-nya diharapkan meningkatkan akurasi model dibandingkan pendekatan unimodal.
 
 ---
 
-## Dataset
-Dataset mengikuti struktur MIREX Mood Classification dan terdiri dari:
+## 📂 Dataset  
+Dataset multimodal mengacu pada kerangka kerja *MIREX Mood Classification* serta metodologi yang diperkenalkan oleh Panda et al. (2013).  
 
-- 903 Audio
-- 764 Lyrics
-- 193 MIDI
-- 193 data lengkap (intersection) untuk model multimodal
+### Ketersediaan Data  
+| Modalitas | Jumlah Sampel | Keterangan |
+|----------|----------------|------------|
+| Audio    | 903 sampel     | 100% tersedia |
+| Lyrics   | 764 sampel     | ~85% dari audio |
+| MIDI     | 193 sampel     | ~21% dari audio |
+| **Intersection (final multimodal)** | **193 sampel** | Digunakan untuk training multimodal |
 
-### Label MIREX Cluster:
-1. Passionate / Rousing / Confident / Boisterous  
+### Label Emosi (MIREX Clusters)
+1. Passionate / Rousing / Confident / Boisterous / Rowdy  
 2. Cheerful / Fun / Sweet / Amiable  
 3. Poignant / Wistful / Brooding  
 4. Humorous / Quirky / Witty  
@@ -26,8 +37,8 @@ Dataset mengikuti struktur MIREX Mood Classification dan terdiri dari:
 
 ---
 
-## Arsitektur Model
-Model baseline terdiri dari tiga cabang pemrosesan paralel. Setiap modalitas menghasilkan probabilitas/logit sebelum digabungkan melalui Late Fusion.
+## 🧪 Arsitektur Model  
+Arsitektur baseline terdiri dari tiga cabang pemrosesan paralel yang masing-masing menghasilkan logit atau probabilitas sebelum digabungkan melalui Late Fusion.
 
 ```
 Audio  → CRNN  → Classifier_A → P_A
@@ -41,74 +52,86 @@ MIDI   → BiGRU → Classifier_M → P_M
           Final Output
 ```
 
-### Keuntungan Late Fusion
+Keuntungan Late Fusion:  
 - Tidak sensitif terhadap missing modality  
-- Masing-masing encoder dapat belajar optimal  
-- Interpretasi kontribusi modalitas lebih jelas  
+- Memungkinkan setiap encoder belajar optimal  
+- Memberikan interpretabilitas kontribusi modalitas  
 
 ---
 
-## Ringkasan EDA
-- **Audio:** Mel-Spectrogram menunjukkan pola energi berbeda antar klaster  
-- **Lyrics:** Didominasi kata emosional seperti *love*, *heart*, *pain*  
-- **MIDI:** Distribusi pitch & velocity bervariasi  
-- **t-SNE:** Embedding belum membentuk cluster tegas → fusion + model nonlinear dibutuhkan  
+## 🔍 Exploratory Data Analysis (EDA) — Ringkasan  
+Beberapa temuan utama:
+
+### ✓ Intra-modal  
+- **Audio**: Mel-Spectrogram menampilkan pola energi berbeda antar klaster.  
+- **Lyrics**: Didominasi kata emosional seperti *love*, *pain*, *heart*. Variasi panjang teks besar → perlu padding/truncation.  
+- **MIDI**: Distribusi pitch & velocity bervariasi; modalitas paling sedikit dan paling noisy.
+
+### ✓ Inter-modal  
+Setiap modalitas memuat informasi emosional berbeda → mendukung pentingnya pendekatan multimodal.
+
+### ✓ Kualitas Label  
+Distribusi klaster tidak seimbang sehingga perlu strategi training yang tepat.
+
+### ✓ t-SNE  
+Embedding tiap modalitas belum membentuk cluster emosional jelas → model nonlinear + fusion sangat diperlukan.
 
 ---
 
-## Setup Eksperimen
-
+## ⚙️ Setup Eksperimen  
 ### Preprocessing  
-**Audio**
-- Resample 22.050 Hz  
-- Mono, durasi 30 detik  
-- Log-mel spectrogram (128 bands)  
-
-**Lyrics**
-- Tokenisasi BERT  
-- Max length 128/256  
-
-**MIDI**
-- Event extraction → embedding → BiGRU  
+- **Audio**:  
+  - Resampling 22.050 Hz  
+  - Mono, durasi seragam 30 detik  
+  - Log-Mel Spectrogram (128 mel bands)  
+- **Lyrics**:  
+  - Tokenisasi BERT  
+  - Max length 128/256  
+  - Padding & truncation  
+- **MIDI**:  
+  - Ekstraksi event → embedding → BiGRU  
 
 ### Hyperparameter  
-- LR: 1e-3 (audio & MIDI), 2e-5 (lyrics)  
 - Optimizer: Adam / AdamW  
-- Batch size: 8–16  
+- LR: 1e-3 (audio), 2e-5 (lyrics), 1e-3 (MIDI)  
+- Batch Size: 8–16  
 - Epoch: 10–20  
 
 ### Data Splitting  
-- Unimodal: stratified 80/20  
-- Multimodal: memakai 193 intersection samples  
+- Unimodal: 80% train — 20% validation (stratified)  
+- Multimodal baseline: seluruh intersection (193 sampel)
 
 ---
 
-## Hasil Baseline
+## 📈 Hasil Baseline (Unimodal)
 
-### Lyrics (BERT)
-- Akurasi ~40–45%  
+### **Lyrics (BERT)**  
+- Akurasi validasi ~40–45%  
+- Kesalahan banyak pada kelas dengan kemiripan semantik  
 
-### Audio (CRNN)
-- Akurasi ~43%  
+### **Audio (CRNN)**  
+- Akurasi maksimum sekitar 43%  
+- Training cenderung underfitting  
 
-### MIDI (BiGRU)
-- Paling rendah karena sedikit data  
+### **MIDI (BiGRU)**  
+- Performa rendah karena dataset sangat kecil  
 
 **Kesimpulan:**  
-Modalitas tunggal tidak cukup kuat → multimodal Late Fusion diperlukan.
+Tidak ada modalitas yang cukup kuat secara individual → Multimodal Late Fusion sangat direkomendasikan.
 
 ---
 
-## Rencana Pengembangan  
-- Implementasi Late Fusion end-to-end  
-- Variasi fusion: weighted, concatenation, attention fusion  
-- Augmentasi audio dan MIDI  
-- Penambahan fitur audio tambahan  
-- Fine-tuning BERT lebih stabil  
+## 🚀 Rencana Pengembangan  
+- Membangun dan melatih **model multimodal Late Fusion end-to-end**  
+- Uji beberapa strategi fusi: concatenation, weighted sum, attention-based fusion  
+- Tambah fitur audio: MFCC, chroma, spectral contrast  
+- Augmentasi audio (pitch/time shift)  
+- Augmentasi MIDI (transposition)  
+- Tuning hyperparameter lanjutan untuk stabilitas training  
 
 ---
 
-## Struktur Repository
+## 📁 Struktur Repository  
 ```
 .
 ├── data/
@@ -134,14 +157,16 @@ Modalitas tunggal tidak cukup kuat → multimodal Late Fusion diperlukan.
 
 ---
 
-## Anggota Kelompok  
-- Lois Novel E. Gurning  
-- Sakti Mujahid Imani  
-- Apridian Saputra  
-- Joshia Fernandes Sectio Purba  
-- Sikah Nubuahtul Ilmi  
+## 👥 Anggota Kelompok  
+- Lois Novel E. Gurning — 122140098  
+- Sakti Mujahid Imani — 122140123  
+- Apridian Saputra — 122140143  
+- Joshia Fernandes Sectio Purba — 122140170  
+- Sikah Nubuahtul Ilmi — 122140208  
 
 ---
 
-## Lisensi  
-Project ini dibuat untuk keperluan akademik mata kuliah Pembelajaran Mesin Multimodal (IF25-40304), Institut Teknologi Sumatera.
+## 📎 Lisensi  
+Project ini dibuat untuk keperluan akademik dalam mata kuliah  
+**Pembelajaran Mesin Multimodal (IF25-40304)**, Institut Teknologi Sumatera.
+
