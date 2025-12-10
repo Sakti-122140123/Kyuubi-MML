@@ -26,7 +26,6 @@ Dataset multimodal mengacu pada kerangka kerja *MIREX Mood Classification* serta
 | Audio    | 903 sampel     | 100% tersedia |
 | Lyrics   | 764 sampel     | ~85% dari audio |
 | MIDI     | 193 sampel     | ~21% dari audio |
-| **Intersection (final multimodal)** | **193 sampel** | Digunakan untuk training multimodal |
 
 ### Label Emosi (MIREX Clusters)
 1. Passionate / Rousing / Confident / Boisterous / Rowdy  
