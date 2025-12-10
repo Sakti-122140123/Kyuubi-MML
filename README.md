@@ -1,7 +1,6 @@
-# 🎵 Multimodal Music Emotion Recognition (MER) — Late Fusion  
+# 🎵 PENGENALAN EMOSI MUSIK MULTIMODAL BERBASIS LATE FUSION PADA DATASET MULTI-MODAL MIREX  
 **Tugas Besar Pembelajaran Mesin Multimodal (IF25-40304)**  
 Kelompok 09 — Institut Teknologi Sumatera  
-*Audio • Lyrics • MIDI | Late Fusion | Deep Learning*
 
 ---
 
