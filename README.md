@@ -444,7 +444,6 @@ Project ini dibuat untuk keperluan akademik dalam mata kuliah **Pembelajaran Mes
 Terima kasih kepada:
 
 - Dosen pengampu mata kuliah Pembelajaran Mesin Multimodal, Bapak I Wayan Wiprayoga Wisesa, S.Kom., M.Kom.
-- Komunitas open-source (PyTorch, Hugging Face, dll)
 - Penyedia dataset MIREX
 
 ---
