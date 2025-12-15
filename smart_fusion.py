@@ -9,14 +9,20 @@ from sklearn.metrics import (
     classification_report,
 )
 
+# ---------------------------------
+# KONFIGURASI
+# ---------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-AUDIO_CSV  = "audio_prob.csv"
-LYRICS_CSV = "lyric_prob.csv"
-MIDI_CSV   = "midi_prob.csv"   # sesuaikan kalau beda
+# Sesuaikan dengan nama file kamu
+# Misal: audio_prob_for_fusion.csv, dst.
+AUDIO_CSV  = "audio_prob_for_fusion.csv"   # atau "audio_prob.csv"
+LYRICS_CSV = "lyrics_prob_for_fusion.csv"  # atau "lyric_prob.csv"
+MIDI_CSV   = "midi_prob_for_fusion.csv"
 
+# Di CSV, true_label kamu = 0..4
+LABELS = [0, 1, 2, 3, 4]
 EMOTION_CLASSES = ["Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5"]
-LABELS = [1, 2, 3, 4, 5]
 
 
 def load_modal_csv(filename, modal_name):
@@ -50,7 +56,7 @@ def normalize_weights(ws):
 
 
 def main():
-    # 1) Load semua CSV
+    # 1) Load semua CSV unimodal
     audio_raw  = load_modal_csv(AUDIO_CSV,  "audio")
     lyrics_raw = load_modal_csv(LYRICS_CSV, "lyrics")
     midi_raw   = load_modal_csv(MIDI_CSV,   "midi")
@@ -60,7 +66,7 @@ def main():
     lyrics = add_prefix(lyrics_raw, "lyrics")
     midi   = add_prefix(midi_raw,   "midi")
 
-    # 3) Outer join berdasarkan id (union semua lagu)
+    # 3) Outer join berdasarkan id + true_label (union semua lagu)
     merged = audio.merge(
         lyrics[["id", "true_label"] + [c for c in lyrics.columns if "prob_cluster_" in c]],
         on=["id", "true_label"],
@@ -72,15 +78,14 @@ def main():
         how="outer"
     )
 
-    # ground truth (anggap semua id punya label konsisten di minimal satu CSV)
     merged["true_label"] = merged["true_label"].astype(int)
     y_true = merged["true_label"].values
 
-        # 4) (Opsional) bobot F1 unimodal dari eksperimenmu sebelumnya
-    # GANTI angka berikut dengan macro F1 VALIDATION sebenarnya
-    f1_audio_val  = 0.13  # misal
-    f1_lyrics_val = 0.12  # misal
-    f1_midi_val   = 0.11  # misal
+    # 4) Bobot F1 unimodal (dari VALIDATION, bukan test)
+    #    >>> GANTI angka di sini dengan macro F1 VAL yang sebenarnya <<<
+    f1_audio_val  = 0.30   # contoh, isi dengan F1 val audio kamu
+    f1_lyrics_val = 0.3956 # contoh, isi dengan F1 val lyrics kamu
+    f1_midi_val   = 0.20   # contoh, isi dengan F1 val MIDI kamu
 
     # Hitung bobot F1-normalized untuk tiap kombinasi
     w_a_l   = normalize_weights([f1_audio_val,  f1_lyrics_val])          # [wa_al, wl_al]
@@ -88,7 +93,7 @@ def main():
     w_l_m   = normalize_weights([f1_lyrics_val, f1_midi_val])            # [wl_lm, wm_lm]
     w_a_l_m = normalize_weights([f1_audio_val,  f1_lyrics_val, f1_midi_val])  # [wa_alm, wl_alm, wm_alm]
 
-    # 5) Fusi per-baris dengan logic "pintar memilih modalitas yang tersedia"
+    # 5) Fusi per-baris dengan logic "smart" (tergantung modalitas yang tersedia)
     y_pred = []
     combo_counts = {
         "audio_only": 0,
@@ -106,21 +111,26 @@ def main():
         has_l = not np.isnan(row.get("prob_cluster_1_lyrics", np.nan))
         has_m = not np.isnan(row.get("prob_cluster_1_midi", np.nan))
 
-        # Ambil vector prob kalau ada
-        pa = None
-        pl = None
-        pm = None
+        pa = pl = pm = None
 
         if has_a:
-            pa = np.array([row[f"prob_cluster_{i}_audio"] for i in range(1, 6)], dtype=float)
+            pa = np.array(
+                [row[f"prob_cluster_{i}_audio"] for i in range(1, 6)],
+                dtype=float
+            )
         if has_l:
-            pl = np.array([row[f"prob_cluster_{i}_lyrics"] for i in range(1, 6)], dtype=float)
+            pl = np.array(
+                [row[f"prob_cluster_{i}_lyrics"] for i in range(1, 6)],
+                dtype=float
+            )
         if has_m:
-            pm = np.array([row[f"prob_cluster_{i}_midi"] for i in range(1, 6)], dtype=float)
+            pm = np.array(
+                [row[f"prob_cluster_{i}_midi"] for i in range(1, 6)],
+                dtype=float
+            )
 
-        # Logic pemilihan kombinasi
+        # Logic kombinasi modalitas
         if has_a and has_l and has_m:
-            # audio + lyrics + midi
             combo_counts["audio_lyrics_midi"] += 1
             wa, wl, wm = w_a_l_m
             p = wa * pa + wl * pl + wm * pm
@@ -153,11 +163,11 @@ def main():
             p = pm
 
         else:
-            # Tidak ada modalitas sama sekali -> fallback: random uniform
+            # tidak ada modalitas sama sekali → fallback uniform
             p = np.ones(5, dtype=float) / 5.0
 
-        # argmax → label 1..5
-        y_pred.append(int(np.argmax(p) + 1))
+        # argmax → label 0..4 (TANPA +1 karena CSV pakai 0..4)
+        y_pred.append(int(np.argmax(p)))
 
     y_pred = np.array(y_pred)
 
@@ -171,6 +181,7 @@ def main():
     print("=== Smart late fusion (conditional, F1-weighted) ===")
     print("Accuracy :", acc)
     print("Macro F1 :", macro_f1)
+
     print("\nPer-class metrics:")
     for i, cls in enumerate(EMOTION_CLASSES):
         print(f"{cls}: precision={prec[i]:.3f}, recall={rec[i]:.3f}, f1={f1_per_class[i]:.3f}")
