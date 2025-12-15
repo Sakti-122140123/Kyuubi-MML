@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Sesuaikan kalau namanya beda
 AUDIO_CSV  = "audio_prob_for_fusion.csv"
-LYRICS_CSV = "lyrics_prob_for_fusion.csv"
+LYRICS_CSV = "lyrics_prob_for_fusion2.csv"
 MIDI_CSV   = "midi_prob_for_fusion.csv"
 
 # Di CSV pipeline baru: true_label = 0..4

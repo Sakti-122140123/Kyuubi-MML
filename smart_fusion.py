@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Sesuaikan dengan nama file kamu
 # Misal: audio_prob_for_fusion.csv, dst.
 AUDIO_CSV  = "audio_prob_for_fusion.csv"   # atau "audio_prob.csv"
-LYRICS_CSV = "lyrics_prob_for_fusion.csv"  # atau "lyric_prob.csv"
+LYRICS_CSV = "lyrics_prob_for_fusion2.csv"  # atau "lyric_prob.csv"
 MIDI_CSV   = "midi_prob_for_fusion.csv"
 
 # Di CSV, true_label kamu = 0..4
