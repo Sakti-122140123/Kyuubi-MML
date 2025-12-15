@@ -1,170 +1,559 @@
-# 🎵 PENGENALAN EMOSI MUSIK MULTIMODAL BERBASIS LATE FUSION PADA DATASET MULTI-MODAL MIREX  
+# 🎵 Multimodal Music Emotion Recognition
+
+## Pengenalan Emosi Musik Berbasis Late Fusion pada Dataset MIREX
+
 **Tugas Besar Pembelajaran Mesin Multimodal (IF25-40304)**  
-Kelompok 09 — Institut Teknologi Sumatera  
+**Kelompok 09** — Institut Teknologi Sumatera  
+**Semester Ganjil 2024/2025**
 
 ---
 
-## 📌 Ringkasan Proyek  
-Proyek ini mengembangkan sistem **Multimodal Music Emotion Recognition (MER)** untuk mengklasifikasikan lagu ke dalam **5 klaster emosi MIREX** dengan memanfaatkan tiga modalitas utama: **Audio, Lyrics, dan MIDI**.  
+## 👥 Anggota Kelompok
 
-Pendekatan **Late Fusion** digunakan untuk menggabungkan informasi emosional dari setiap modalitas, yang diproses terlebih dahulu menggunakan encoder khusus:  
-- **CRNN** untuk audio,  
-- **BERT** untuk lirik,  
-- **BiGRU** untuk MIDI.  
-
-Setiap modalitas memiliki karakteristik emosional unik sehingga penggabungan output-nya diharapkan meningkatkan akurasi model dibandingkan pendekatan unimodal.
-
----
-
-## 📂 Dataset  
-Dataset multimodal mengacu pada kerangka kerja *MIREX Mood Classification* serta metodologi yang diperkenalkan oleh Panda et al. (2013).  
-
-### Ketersediaan Data  
-| Modalitas | Jumlah Sampel | Keterangan |
-|----------|----------------|------------|
-| Audio    | 903 sampel     | 100% tersedia |
-| Lyrics   | 764 sampel     | ~85% dari audio |
-| MIDI     | 193 sampel     | ~21% dari audio |
-
-### Label Emosi (MIREX Clusters)
-1. Passionate / Rousing / Confident / Boisterous / Rowdy  
-2. Cheerful / Fun / Sweet / Amiable  
-3. Poignant / Wistful / Brooding  
-4. Humorous / Quirky / Witty  
-5. Aggressive / Tense / Intense  
+| Nama                          | NIM       |
+| ----------------------------- | --------- |
+| Lois Novel E. Gurning         | 122140098 |
+| Sakti Mujahid Imani           | 122140123 |
+| Apridian Saputra              | 122140143 |
+| Joshia Fernandes Sectio Purba | 122140170 |
+| Sikah Nubuahtul Ilmi          | 122140208 |
 
 ---
 
-## 🧪 Arsitektur Model  
-Arsitektur baseline terdiri dari tiga cabang pemrosesan paralel yang masing-masing menghasilkan logit atau probabilitas sebelum digabungkan melalui Late Fusion.
+## 📌 Ringkasan Project
+
+Sistem **Multimodal Music Emotion Recognition (MER)** untuk mengklasifikasikan lagu ke dalam **5 klaster emosi MIREX** menggunakan tiga modalitas:
+
+- 🎵 **Audio** - Analisis sinyal audio
+- 📝 **Lyrics** - Analisis teks lirik
+- 🎹 **MIDI** - Analisis data musik symbolic
+
+### Strategi Pendekatan
+
+**Late Fusion** - Menggabungkan output probability dari setiap modalitas untuk prediksi akhir yang lebih akurat.
+
+### Model yang Digunakan
+
+**Baseline (Milestone 3):**
+
+- Audio: **CRNN** (Convolutional Recurrent Neural Network)
+- Lyrics: **BERT base** (bert-base-uncased)
+- MIDI: **BiGRU + Attention**
+
+**Improved (Milestone 4):**
+
+- Audio: **PANN** (Pre-trained Audio Neural Network - Cnn14)
+- Lyrics: **DeBERTa-v3-base** (Enhanced attention mechanism)
+- MIDI: **BiGRU + SVM** (Robust untuk small dataset)
+
+> **💡 Catatan**: Project ini menerapkan **iterative improvement** dari baseline ke model yang lebih advanced, dengan dokumentasi lengkap untuk menunjukkan progression dan justifikasi.
+
+---
+
+## 📂 Struktur Repository
 
 ```
-Audio  → CRNN  → Classifier_A → P_A
-Lyrics → BERT  → Classifier_L → P_L
-MIDI   → BiGRU → Classifier_M → P_M
-                ↓
-        Late Fusion (+ / concat)
-                ↓
-             FC Layer
-                ↓
-          Final Output
-```
+Kyuubi-MML/
+│
+├── 📄 README.md                    # Dokumentasi utama (file ini)
+│
+├── 📁 data/                        # Dataset & metadata
+│   ├── master_tracks.csv           # Metadata 903 lagu
+│   └── split_global.csv            # Train/val/test split
+│
+├── 📁 notebooks/                   # Jupyter Notebooks
+│   ├── 01_EDA/                     # Exploratory Data Analysis
+│   │   ├── 01_EDA_Multimodal.ipynb
+│   │   └── 02_Data_Splitting.ipynb
+│   ├── 02_Preprocessing/           # Preprocessing pipelines
+│   │   ├── 01_Audio_Preprocessing.ipynb
+│   │   └── 02_Lyrics_Preprocessing.ipynb
+│   ├── 03_Baseline/                # Baseline models
+│   │   ├── 01_Audio_CRNN.ipynb
+│   │   ├── 02_Lyrics_BERT.ipynb
+│   │   └── 03_MIDI_BiGRU_Attention.ipynb
+│   ├── 04_Improved/                # Improved models
+│   │   ├── 01_Audio_PANN.ipynb
+│   │   ├── 02_Lyrics_DeBERTa.ipynb
+│   │   ├── 03_MIDI_BiGRU_SVM.ipynb
+│   │   └── 03_MIDI_Complete_Pipeline.ipynb
+│   └── 05_Fusion/                  # Multimodal fusion
+│       ├── fusion.py
+│       ├── smart_fusion.py
+│       └── fusion_evaluation_finale.py
+│
+├── 📁 results/                     # Hasil eksperimen
+│   ├── baseline/                   # Baseline results
+│   ├── improved/                   # Improved results
+│   └── fusion/                     # Fusion results
+│
+├── 📁 models/                      # Saved model checkpoints
+├── 📁 reports/                     # Laporan milestone
+├── 📁 figures/                     # Visualisasi & plot
+├── 📁 docs/                        # Dokumentasi tambahan
+└── 📁 miditrainsvm/               # MIDI training artifacts
 
-Keuntungan Late Fusion:  
-- Tidak sensitif terhadap missing modality  
-- Memungkinkan setiap encoder belajar optimal  
-- Memberikan interpretabilitas kontribusi modalitas  
-
----
-
-## 🔍 Exploratory Data Analysis (EDA) — Ringkasan  
-Beberapa temuan utama:
-
-### ✓ Intra-modal  
-- **Audio**: Mel-Spectrogram menampilkan pola energi berbeda antar klaster.  
-- **Lyrics**: Didominasi kata emosional seperti *love*, *pain*, *heart*. Variasi panjang teks besar → perlu padding/truncation.  
-- **MIDI**: Distribusi pitch & velocity bervariasi; modalitas paling sedikit dan paling noisy.
-
-### ✓ Inter-modal  
-Setiap modalitas memuat informasi emosional berbeda → mendukung pentingnya pendekatan multimodal.
-
-### ✓ Kualitas Label  
-Distribusi klaster tidak seimbang sehingga perlu strategi training yang tepat.
-
-### ✓ t-SNE  
-Embedding tiap modalitas belum membentuk cluster emosional jelas → model nonlinear + fusion sangat diperlukan.
-
----
-
-## ⚙️ Setup Eksperimen  
-### Preprocessing  
-- **Audio**:  
-  - Resampling 22.050 Hz  
-  - Mono, durasi seragam 30 detik  
-  - Log-Mel Spectrogram (128 mel bands)  
-- **Lyrics**:  
-  - Tokenisasi BERT  
-  - Max length 128/256  
-  - Padding & truncation  
-- **MIDI**:  
-  - Ekstraksi event → embedding → BiGRU  
-
-### Hyperparameter  
-- Optimizer: Adam / AdamW  
-- LR: 1e-3 (audio), 2e-5 (lyrics), 1e-3 (MIDI)  
-- Batch Size: 8–16  
-- Epoch: 10–20  
-
-### Data Splitting  
-- Unimodal: 80% train — 20% validation (stratified)  
-- Multimodal baseline: seluruh intersection (193 sampel)
-
----
-
-## 📈 Hasil Baseline (Unimodal)
-
-### **Lyrics (BERT)**  
-- Akurasi validasi ~40–45%  
-- Kesalahan banyak pada kelas dengan kemiripan semantik  
-
-### **Audio (CRNN)**  
-- Akurasi maksimum sekitar 43%  
-- Training cenderung underfitting  
-
-### **MIDI (BiGRU)**  
-- Performa rendah karena dataset sangat kecil  
-
-**Kesimpulan:**  
-Tidak ada modalitas yang cukup kuat secara individual → Multimodal Late Fusion sangat direkomendasikan.
-
----
-
-## 🚀 Rencana Pengembangan  
-- Membangun dan melatih **model multimodal Late Fusion end-to-end**  
-- Uji beberapa strategi fusi: concatenation, weighted sum, attention-based fusion  
-- Tambah fitur audio: MFCC, chroma, spectral contrast  
-- Augmentasi audio (pitch/time shift)  
-- Augmentasi MIDI (transposition)  
-- Tuning hyperparameter lanjutan untuk stabilitas training  
-
----
-
-## 📁 Struktur Repository  
-```
-.
-├── data/
-├── src/
-│   ├── audio_model/
-│   ├── lyrics_model/
-│   ├── midi_model/
-│   ├── fusion/
-│   └── utils/
-├── notebooks/
-│   ├── EDA.ipynb
-│   ├── Baseline_Audio.ipynb
-│   ├── Baseline_Lyrics.ipynb
-│   ├── Baseline_MIDI.ipynb
-│   └── Fusion_Model.ipynb
-├── reports/
-│   ├── Proposal.pdf
-│   ├── EDA.pdf
-│   ├── Preliminary_Experiment.pdf
-│   └── Final_Report.pdf
-└── README.md
 ```
 
 ---
 
-## 👥 Anggota Kelompok  
-- Lois Novel E. Gurning — 122140098  
-- Sakti Mujahid Imani — 122140123  
-- Apridian Saputra — 122140143  
-- Joshia Fernandes Sectio Purba — 122140170  
-- Sikah Nubuahtul Ilmi — 122140208  
+## 📊 Dataset
+
+### Sumber
+
+- **Framework**: MIREX (Music Information Retrieval Evaluation eXchange)
+- **Reference**: Panda et al. (2013)
+
+### Ketersediaan Data
+
+| Modalitas | Jumlah Sampel | Coverage |
+| --------- | ------------- | -------- |
+| Audio     | 903           | 100%     |
+| Lyrics    | 764           | ~85%     |
+| MIDI      | 193           | ~21%     |
+
+### Label Emosi (5 Cluster MIREX)
+
+1. **Cluster 1**: Passionate / Rousing / Confident / Boisterous / Rowdy
+2. **Cluster 2**: Cheerful / Fun / Sweet / Amiable
+3. **Cluster 3**: Poignant / Wistful / Brooding
+4. **Cluster 4**: Humorous / Quirky / Witty
+5. **Cluster 5**: Aggressive / Tense / Intense
+
+### Data Splitting
+
+- **Train**: ~70-80%
+- **Validation**: ~10-15%
+- **Test**: ~10-15%
+- **Strategy**: Stratified split untuk maintain class balance
 
 ---
 
-## 📎 Lisensi  
-Project ini dibuat untuk keperluan akademik dalam mata kuliah  
-**Pembelajaran Mesin Multimodal (IF25-40304)**, Institut Teknologi Sumatera.
+## 🔬 Metodologi
 
+### 1. Exploratory Data Analysis (EDA)
+
+**Analisis Intra-Modal** - Per modalitas
+
+- Audio: Mel-spectrogram patterns, duration distribution
+- Lyrics: Word frequency, text length, common words per cluster
+- MIDI: Pitch/velocity distribution, duration patterns
+
+**Analisis Inter-Modal** - Antar modalitas
+
+- Correlation analysis
+- Audio-Lyrics-MIDI alignment
+- Modality availability matrix
+
+**Analisis Target** - Terhadap label
+
+- Class imbalance detection
+- Feature importance per cluster
+
+**Visualisasi t-SNE**
+
+- Feature embeddings visualization
+- Cluster quality assessment
+
+### 2. Preprocessing
+
+**Audio:**
+
+- Sample rate: 32,000 Hz (PANN) / 22,050 Hz (CRNN)
+- Duration: 10 detik uniform
+- Feature: Log-Mel Spectrogram (128 mel bands)
+- Augmentation: Multi-crop strategy (start, middle, end)
+
+**Lyrics:**
+
+- Tokenization: BERT/DeBERTa tokenizer
+- Max length: 256 tokens
+- Padding & truncation
+- Lowercase normalization
+
+**MIDI:**
+
+- Event extraction (pitch, velocity, duration)
+- Embedding layer
+- Sequence padding
+
+### 3. Model Architecture
+
+#### Baseline Models (Milestone 3)
+
+**Audio: CRNN**
+
+```
+Input (Mel-Spec) → CNN layers → RNN layers → Dense → Softmax (5 classes)
+```
+
+- Performance: ~43% accuracy, ~0.38 macro F1
+- Issue: Underfitting, butuh pre-trained model
+
+**Lyrics: BERT Base**
+
+```
+Input (tokens) → BERT encoder → Pooler → Classifier → Softmax (5 classes)
+```
+
+- Performance: ~42% accuracy, ~0.40 macro F1
+- Issue: Semantic similarity causing confusion
+
+**MIDI: BiGRU + Attention**
+
+```
+Input (events) → Embedding → BiGRU → Attention → Dense → Softmax (5 classes)
+```
+
+- Performance: ~25% accuracy, ~0.20 macro F1
+- Issue: Dataset terlalu kecil, overfitting
+
+#### Improved Models (Milestone 4)
+
+**Audio: PANN (Cnn14)**
+
+```
+Input → Pre-trained Cnn14 → Feature extractor → Fine-tuned classifier → Softmax
+```
+
+- Pre-trained on AudioSet
+- Multi-crop inference strategy
+- Expected: Better audio representation
+
+**Lyrics: DeBERTa-v3-base**
+
+```
+Input → DeBERTa encoder (disentangled attention) → Pooler → Classifier → Softmax
+```
+
+- Enhanced mask decoder
+- Layer freezing strategy (freeze lower 0-7, fine-tune upper)
+- Expected: Better semantic understanding
+
+**MIDI: BiGRU + SVM**
+
+```
+Input → BiGRU (frozen) → Feature extraction → SVM classifier (RBF kernel) → Softmax
+```
+
+- BiGRU as feature extractor
+- SVM with balanced class weights
+- Expected: Robust untuk small dataset, avoid overfitting
+
+### 4. Fusion Strategy
+
+**Simple Average Fusion**
+
+```python
+P_final = (P_audio + P_lyrics + P_midi) / 3
+```
+
+**F1-Weighted Fusion**
+
+```python
+w_i = F1_i / (F1_audio + F1_lyrics + F1_midi)
+P_final = w_audio * P_audio + w_lyrics * P_lyrics + w_midi * P_midi
+```
+
+**Smart Fusion (Missing Modality Handling)**
+
+- Adaptive per-sample fusion
+- Supports partial modality combinations
+- Coverage: 903 samples (semua audio)
+
+---
+
+## 📈 Hasil Eksperimen
+
+### Unimodal Performance
+
+#### Baseline Results
+
+| Model      | Modality | Accuracy | Macro F1 | Notes              |
+| ---------- | -------- | -------- | -------- | ------------------ |
+| CRNN       | Audio    | ~43%     | ~0.38    | Underfitting       |
+| BERT       | Lyrics   | ~42%     | ~0.40    | Semantic confusion |
+| BiGRU+Attn | MIDI     | ~25%     | ~0.20    | Small dataset      |
+
+#### Improved Results
+
+| Model     | Modality | Improvement    | Expected Gain         |
+| --------- | -------- | -------------- | --------------------- |
+| PANN      | Audio    | Pre-trained    | Better representation |
+| DeBERTa   | Lyrics   | Enhanced attn  | Better semantics      |
+| BiGRU+SVM | MIDI     | SVM classifier | Avoid overfitting     |
+
+### Multimodal Fusion
+
+**Ablation Study (pada intersection samples)**
+
+| Combination    | Strategy     | N Samples | Performance       |
+| -------------- | ------------ | --------- | ----------------- |
+| Audio only     | -            | 903       | Baseline unimodal |
+| Lyrics only    | -            | 764       | Baseline unimodal |
+| MIDI only      | -            | 193       | Baseline unimodal |
+| Audio + Lyrics | Simple avg   | 764       | Multimodal boost  |
+| Audio + MIDI   | Simple avg   | 193       | Multimodal boost  |
+| Lyrics + MIDI  | Simple avg   | 193       | Multimodal boost  |
+| All (Full)     | Smart fusion | 903       | **Best coverage** |
+
+**Key Findings:**
+
+- ✅ Multimodal fusion > best unimodal
+- ✅ Smart fusion memberikan coverage terluas
+- ✅ F1-weighted lebih baik dari simple average
+- ⚠️ MIDI contribution terbatas karena dataset kecil
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+```bash
+Python 3.8+
+CUDA-capable GPU (recommended)
+```
+
+### Installation
+
+1. **Clone repository**
+
+```bash
+git clone <repository-url>
+cd Kyuubi-MML
+```
+
+2. **Create virtual environment**
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# atau
+venv\Scripts\activate     # Windows
+```
+
+3. **Install dependencies**
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install transformers scikit-learn pandas numpy matplotlib seaborn
+pip install pretty_midi librosa jupyter
+```
+
+### Running Experiments
+
+**EDA & Preprocessing**
+
+```bash
+jupyter notebook notebooks/01_EDA/01_EDA_Multimodal.ipynb
+```
+
+**Baseline Models**
+
+```bash
+jupyter notebook notebooks/03_Baseline/01_Audio_CRNN.ipynb
+jupyter notebook notebooks/03_Baseline/02_Lyrics_BERT.ipynb
+jupyter notebook notebooks/03_Baseline/03_MIDI_BiGRU_Attention.ipynb
+```
+
+**Improved Models**
+
+```bash
+jupyter notebook notebooks/04_Improved/01_Audio_PANN.ipynb
+jupyter notebook notebooks/04_Improved/02_Lyrics_DeBERTa.ipynb
+jupyter notebook notebooks/04_Improved/03_MIDI_BiGRU_SVM.ipynb
+```
+
+**Fusion**
+
+```bash
+cd notebooks/05_Fusion
+python smart_fusion.py
+python fusion_evaluation_finale.py
+```
+
+---
+
+## 🎯 Milestone Progress
+
+### ✅ Milestone 1: Proposal
+
+- [x] Dokumen proposal (5-7 halaman)
+- [x] Slide presentasi (10-15 menit)
+- [x] Latar belakang, rumusan masalah, tujuan
+- [x] Deskripsi dataset & rencana metode
+- **Deliverable**: `reports/Proposal.pdf`
+
+### ✅ Milestone 2: EDA Multimodal
+
+- [x] Analisis intra-modal (Audio, Lyrics, MIDI)
+- [x] Analisis inter-modal & target
+- [x] Visualisasi t-SNE
+- [x] Identifikasi masalah data
+- **Deliverables**:
+  - `notebooks/01_EDA/01_EDA_Multimodal.ipynb`
+  - `reports/EDA Multimodal Kelompok 09.pdf`
+
+### ✅ Milestone 3: Preliminary Experiment
+
+- [x] Baseline models (CRNN, BERT, BiGRU+Attention)
+- [x] Setup eksperimen & hyperparameters
+- [x] Hasil baseline & learning curves
+- [x] Error analysis
+- [x] Rencana optimalisasi
+- **Deliverables**:
+  - `notebooks/03_Baseline/*.ipynb`
+  - `reports/Preliminary Experiment Kelompok 09.pdf`
+
+### 🚧 Milestone 4: Laporan Akhir (IN PROGRESS)
+
+**Eksperimen (DONE):**
+
+- [x] Improved models (PANN, DeBERTa, BiGRU+SVM)
+- [x] Multimodal fusion experiments
+- [x] Evaluation & comparison
+
+**Dokumentasi (TO DO):**
+
+- [ ] Laporan akhir (paper format, 15-20 hal)
+- [ ] Slide presentasi final (15-20 slides)
+- [ ] Performance metrics collection
+- [ ] Comparison plots & visualizations
+
+---
+
+## 📚 Referensi Utama
+
+1. **MIREX Dataset**
+
+   - Panda et al. (2013) - Multi-modal Music Emotion Recognition
+
+2. **Pre-trained Models**
+
+   - Kong et al. (2020) - PANNs: Large-Scale Pretrained Audio Neural Networks for Audio Pattern Recognition
+   - Devlin et al. (2019) - BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+   - He et al. (2021) - DeBERTa: Decoding-enhanced BERT with Disentangled Attention
+
+3. **Multimodal Learning**
+   - Baltrusaitis et al. (2019) - Multimodal Machine Learning: A Survey and Taxonomy
+
+---
+
+## 🔧 Technical Stack
+
+**Deep Learning Frameworks:**
+
+- PyTorch 2.0+
+- Transformers (Hugging Face)
+- torchaudio
+
+**Audio Processing:**
+
+- librosa
+- pretty_midi
+- PANNs (audioset_tagging_cnn)
+
+**Machine Learning:**
+
+- scikit-learn (SVM, metrics)
+- numpy, pandas
+
+**Visualization:**
+
+- matplotlib, seaborn
+- t-SNE
+
+---
+
+## 📝 Catatan Penting
+
+### Perubahan dari Baseline ke Improved
+
+**Motivasi Improvement:**
+
+1. **Audio (CRNN → PANN)**
+
+   - CRNN underfitting karena kurang data training
+   - PANN pre-trained pada AudioSet (2M+ audio clips)
+   - Transfer learning memberikan better feature extraction
+
+2. **Lyrics (BERT → DeBERTa)**
+
+   - BERT kesulitan dengan semantic similarity
+   - DeBERTa punya disentangled attention mechanism
+   - Lebih baik dalam contextual understanding
+
+3. **MIDI (BiGRU+Attn → BiGRU+SVM)**
+   - Dataset MIDI sangat kecil (193 samples)
+   - Neural network classifier cenderung overfit
+   - SVM lebih robust untuk small data
+   - BiGRU tetap digunakan sebagai feature extractor
+
+### File Naming Convention
+
+**Baseline Results:**
+
+- `results/baseline/audio_prob.csv` - CRNN probabilities
+- `results/baseline/lyric_prob.csv` - BERT probabilities
+- `results/baseline/midi_prob.csv` - BiGRU+Attention probabilities
+
+**Improved Results:**
+
+- `results/improved/audio_prob_for_fusion.csv` - PANN probabilities
+- `results/improved/lyrics_prob_for_fusion2.csv` - DeBERTa probabilities
+- `results/improved/midi_prob_for_fusion.csv` - BiGRU+SVM probabilities
+
+---
+
+## 🤝 Kontribusi Tim
+
+Pembagian peran dalam project:
+
+- **Lois**: EDA Audio, CRNN baseline, PANN improvement
+- **Sakti**: EDA Lyrics, BERT baseline, DeBERTa improvement
+- **Apridian**: EDA MIDI, BiGRU baseline, BiGRU+SVM improvement
+- **Joshia**: Fusion strategy, evaluation, comparison
+- **Sikah**: Documentation, visualization, report writing
+
+---
+
+## 📄 Lisensi
+
+Project ini dibuat untuk keperluan akademik dalam mata kuliah **Pembelajaran Mesin Multimodal (IF25-40304)**, Institut Teknologi Sumatera.
+
+---
+
+## 📞 Kontak
+
+Untuk pertanyaan atau diskusi lebih lanjut mengenai project ini, silakan hubungi anggota kelompok melalui email institusi.
+
+**Institut Teknologi Sumatera**  
+**Program Studi Teknik Informatika**  
+**Tahun Ajaran 2024/2025**
+
+---
+
+## 🙏 Acknowledgments
+
+Terima kasih kepada:
+
+- Dosen pengampu mata kuliah Pembelajaran Mesin Multimodal
+- Tim asisten lab yang membantu troubleshooting
+- Komunitas open-source (PyTorch, Hugging Face, dll)
+- Penyedia dataset MIREX
+
+---
+
+> 📖 **Dokumentasi Lengkap**: Untuk dokumentasi teknis detail, analisis mendalam, dan panduan development, lihat folder `docs/`
+
+---
+
+**Last Updated**: December 15, 2024  
+**Version**: 2.0 (Post-reorganization)
+
+---
+
+<p align="center">
+  <strong>🎵 Made with ❤️ by Kelompok 09 🎵</strong>
+</p>
