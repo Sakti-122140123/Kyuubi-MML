@@ -306,75 +306,6 @@ P_final = w_audio * P_audio + w_lyrics * P_lyrics + w_midi * P_midi
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-```bash
-Python 3.8+
-CUDA-capable GPU (recommended)
-```
-
-### Installation
-
-1. **Clone repository**
-
-```bash
-git clone <repository-url>
-cd Kyuubi-MML
-```
-
-2. **Create virtual environment**
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# atau
-venv\Scripts\activate     # Windows
-```
-
-3. **Install dependencies**
-
-```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip install transformers scikit-learn pandas numpy matplotlib seaborn
-pip install pretty_midi librosa jupyter
-```
-
-### Running Experiments
-
-**EDA & Preprocessing**
-
-```bash
-jupyter notebook notebooks/01_EDA/01_EDA_Multimodal.ipynb
-```
-
-**Baseline Models**
-
-```bash
-jupyter notebook notebooks/03_Baseline/01_Audio_CRNN.ipynb
-jupyter notebook notebooks/03_Baseline/02_Lyrics_BERT.ipynb
-jupyter notebook notebooks/03_Baseline/03_MIDI_BiGRU_Attention.ipynb
-```
-
-**Improved Models**
-
-```bash
-jupyter notebook notebooks/04_Improved/01_Audio_PANN.ipynb
-jupyter notebook notebooks/04_Improved/02_Lyrics_DeBERTa.ipynb
-jupyter notebook notebooks/04_Improved/03_MIDI_BiGRU_SVM.ipynb
-```
-
-**Fusion**
-
-```bash
-cd notebooks/05_Fusion
-python smart_fusion.py
-python fusion_evaluation_finale.py
-```
-
----
-
 ## 🎯 Milestone Progress
 
 ### ✅ Milestone 1: Proposal
@@ -406,20 +337,13 @@ python fusion_evaluation_finale.py
   - `notebooks/03_Baseline/*.ipynb`
   - `reports/Preliminary Experiment Kelompok 09.pdf`
 
-### 🚧 Milestone 4: Laporan Akhir (IN PROGRESS)
-
-**Eksperimen (DONE):**
+### ✅ Milestone 4: Laporan Akhir
 
 - [x] Improved models (PANN, DeBERTa, BiGRU+SVM)
 - [x] Multimodal fusion experiments
 - [x] Evaluation & comparison
-
-**Dokumentasi (TO DO):**
-
-- [ ] Laporan akhir (paper format, 15-20 hal)
-- [ ] Slide presentasi final (15-20 slides)
-- [ ] Performance metrics collection
-- [ ] Comparison plots & visualizations
+- **Deliverables**:
+  - `reports/Final Project.pdf`
 
 ---
 
@@ -428,15 +352,6 @@ python fusion_evaluation_finale.py
 1. **MIREX Dataset**
 
    - Panda et al. (2013) - Multi-modal Music Emotion Recognition
-
-2. **Pre-trained Models**
-
-   - Kong et al. (2020) - PANNs: Large-Scale Pretrained Audio Neural Networks for Audio Pattern Recognition
-   - Devlin et al. (2019) - BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
-   - He et al. (2021) - DeBERTa: Decoding-enhanced BERT with Disentangled Attention
-
-3. **Multimodal Learning**
-   - Baltrusaitis et al. (2019) - Multimodal Machine Learning: A Survey and Taxonomy
 
 ---
 
