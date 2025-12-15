@@ -510,11 +510,11 @@ python fusion_evaluation_finale.py
 
 Pembagian peran dalam project:
 
-- **Lois**: EDA Audio, CRNN baseline, PANN improvement
-- **Sakti**: EDA Lyrics, BERT baseline, DeBERTa improvement
-- **Apridian**: EDA MIDI, BiGRU baseline, BiGRU+SVM improvement
-- **Joshia**: Fusion strategy, evaluation, comparison
-- **Sikah**: Documentation, visualization, report writing
+- **Joshia**: EDA Audio, CRNN baseline, PANN improvement
+- **Apridian**: EDA Lyrics, BERT baseline, DeBERTa improvement
+- **Sikah**: EDA MIDI, BiGRU baseline, BiGRU+SVM improvement
+- **Louis**: Fusion strategy, evaluation, comparison
+- **Sakti**: Documentation, visualization, report writing
 
 ---
 
@@ -524,33 +524,13 @@ Project ini dibuat untuk keperluan akademik dalam mata kuliah **Pembelajaran Mes
 
 ---
 
-## 📞 Kontak
-
-Untuk pertanyaan atau diskusi lebih lanjut mengenai project ini, silakan hubungi anggota kelompok melalui email institusi.
-
-**Institut Teknologi Sumatera**  
-**Program Studi Teknik Informatika**  
-**Tahun Ajaran 2024/2025**
-
----
-
 ## 🙏 Acknowledgments
 
 Terima kasih kepada:
 
-- Dosen pengampu mata kuliah Pembelajaran Mesin Multimodal
-- Tim asisten lab yang membantu troubleshooting
+- Dosen pengampu mata kuliah Pembelajaran Mesin Multimodal, Bapak I Wayan Wiprayoga Wisesa, S.Kom., M.Kom.
 - Komunitas open-source (PyTorch, Hugging Face, dll)
 - Penyedia dataset MIREX
-
----
-
-> 📖 **Dokumentasi Lengkap**: Untuk dokumentasi teknis detail, analisis mendalam, dan panduan development, lihat folder `docs/`
-
----
-
-**Last Updated**: December 15, 2024  
-**Version**: 2.0 (Post-reorganization)
 
 ---
 
