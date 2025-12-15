@@ -1,0 +1,12 @@
+Model / Fusion,Type,Accuracy,Macro F1
+Audio only (full),unimodal,0.19480519480519481,0.13191266250089778
+Lyrics only (full),unimodal,0.12987012987012986,0.1168774465522433
+MIDI only (full),unimodal,0.15,0.10683760683760683
+Audio+Lyrics (equal),fusion_equal,0.1780821917808219,0.15227365227365228
+Audio+Lyrics (F1),fusion_f1,0.1780821917808219,0.1527027027027027
+Audio+MIDI (equal),fusion_equal,0.0,0.0
+Audio+MIDI (F1),fusion_f1,0.0,0.0
+Lyrics+MIDI (equal),fusion_equal,0.0,0.0
+Lyrics+MIDI (F1),fusion_f1,0.0,0.0
+Audio+Lyrics+MIDI (equal),fusion_equal,0.0,0.0
+Audio+Lyrics+MIDI (F1),fusion_f1,0.0,0.0
