@@ -34,13 +34,13 @@ Sistem **Multimodal Music Emotion Recognition (MER)** untuk mengklasifikasikan l
 
 ### Model yang Digunakan
 
-**Baseline (Milestone 3):**
+**Baseline**
 
 - Audio: **CRNN** (Convolutional Recurrent Neural Network)
 - Lyrics: **BERT base** (bert-base-uncased)
 - MIDI: **BiGRU + Attention**
 
-**Improved (Milestone 4):**
+**Improved**
 
 - Audio: **PANN** (Pre-trained Audio Neural Network - Cnn14)
 - Lyrics: **DeBERTa-v3-base** (Enhanced attention mechanism)
